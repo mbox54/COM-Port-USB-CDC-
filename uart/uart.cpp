@@ -25,28 +25,12 @@
 #include "stdafx.h"
 
 #include <stdio.h>
-#include <windows.h>
-#include <dbt.h>
 #include <conio.h>
-#include "..\..\..\library\CyUSBSerialVCP\CyUSBSerialVCP.h"
+//#include "..\..\..\library\CyUSBSerialVCP\CyUSBSerialVCP.h"
 
-/** ****************
-Data Definitions
-*** **************** */     
-#define COM_PORT_STRING_LEN             256
-#define DEFAULT_WRITE_TIMEOUT           2000
-#define DEFAULT_READ_TIMEOUT            2000
-
-#define DEFAULT_UART_BAUDRATE           500000 //(500K Bauds).
-#define UART_3M_BAUDRATE                3000000 // 3 MBbps
-
-#define USBUART_BUFFER_SIZE				64
+#include "COMPort.h"
 
 
-#define COM_PORT_OP_SUCCESS				0x00
-#define COM_PORT_IS_EMPTY				0x01
-#define COM_PORT_OP_FAILURE				0x02
-#define COM_PORT_OP_MISMATCH			0x03
 
 /** ****************
 Functions
@@ -59,7 +43,7 @@ int InitProg()
 	return 0;
 }
 
-
+/*
 int COMPort_Open(HANDLE * hPort, DWORD dwComNum)
 {		
 	// > Open PORT
@@ -265,6 +249,7 @@ int COMPort_Close(HANDLE * hPort)
 
 	return COM_PORT_OP_SUCCESS;
 }
+*/
 
 /** ********************************
 Application main() function
@@ -290,6 +275,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	_tscanf_s(_T("%d"), &dwComNum, 4);
 
 	// > Open USBUART Device	
+	char szPort[COM_PORT_STRING_LEN];
+	sprintf_s(szPort, sizeof(szPort), "\\\\.\\COM%d", dwComNum);
 	int iResult = COMPort_Open(&hPort, dwComNum);
 
 	if (iResult != COM_PORT_OP_SUCCESS)

@@ -101,10 +101,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="COMPort.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="uart.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="COMPort.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
