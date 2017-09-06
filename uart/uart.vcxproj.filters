@@ -21,12 +21,18 @@
     <ClCompile Include="uart.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="COMPort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="COMPort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
