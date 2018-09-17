@@ -12,7 +12,10 @@
 /** ****************
 Functions
 *** **************** */
-int COMPort_Open(HANDLE * hPort, DWORD dwComNum)
+// NOTE:
+// 1 = Overlapped
+// 0 = non-overlapped
+int COMPort_Open(HANDLE * hPort, DWORD dwComNum, bool fOverlapped)
 {
 	// > Open PORT
 	char szPort[COM_PORT_STRING_LEN];
@@ -44,20 +47,45 @@ int COMPort_Open(HANDLE * hPort, DWORD dwComNum)
 	szPort[7 + ucDigitLen] = '\0';
 
 	// > Define Communication Regime
-	// This creates a synchronous handle. So that only a read or write can be performed
-	// for this at a particular point of time.
-	// For performing Read and Write operation together, please refer to OVERLAPPED COM
-	// PORT USAGE example.
-	*hPort = CreateFileA(szPort, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, NULL);
-	if (*hPort == INVALID_HANDLE_VALUE) return -1;
+	// This creates a synchronous handle or asynchronous handle.
+	*hPort = CreateFileA(
+		szPort, 
+		GENERIC_READ | GENERIC_WRITE, 
+		0, 
+		0, 
+		OPEN_EXISTING, 
+		fOverlapped ? FILE_FLAG_OVERLAPPED : 0,
+		NULL);
+
+	if (*hPort == INVALID_HANDLE_VALUE)
+	{
+		return -1;
+	}
 
 
 	// > Set the Read and Write API time outs.
 	// These Values will be over ridden during read/write API timeout.
 	COMMTIMEOUTS objTimeout;
 	GetCommTimeouts(*hPort, &objTimeout);
-	objTimeout.WriteTotalTimeoutConstant = DEFAULT_WRITE_TIMEOUT;
-	objTimeout.ReadTotalTimeoutConstant = DEFAULT_READ_TIMEOUT;
+
+	switch (fOverlapped)
+	{
+	case 0:		// blocking: DEFAULT_WRITE_TIMEOUT / DEFAULT_READ_TIMEOUT
+		objTimeout.WriteTotalTimeoutConstant = DEFAULT_WRITE_TIMEOUT;
+		objTimeout.ReadTotalTimeoutConstant = DEFAULT_READ_TIMEOUT;
+
+		break;
+
+	case 1:		// non-blocking: MAXDWORD
+		objTimeout.ReadIntervalTimeout = MAXDWORD;
+
+		break;
+
+
+	default:
+		//err case
+		break;
+	}
 
 	// Set up the time out value for ReadFile and WriteFile API.
 	SetCommTimeouts(*hPort, &objTimeout);
@@ -205,6 +233,50 @@ int COMPort_Write(HANDLE * hPort, UCHAR * v_WriteBuffer, DWORD * dwNumBytesWritt
 	else
 	{
 		if (*dwNumBytesWritten != USBUART_BUFFER_SIZE)
+		{
+			// [ERROR: TRANSFER MISMATCH]
+
+			errNumber = COM_PORT_OP_MISMATCH;
+		}
+	}
+
+	if (errNumber != 0)
+	{
+		// [ERROR CASE]
+
+		CloseHandle(*hPort);
+
+		return errNumber;
+	}
+
+
+	return COM_PORT_OP_SUCCESS;
+}
+
+
+int COMPort_Write8(HANDLE * hPort, UCHAR * v_WriteBuffer, DWORD * dwNumBytesWritten)
+{
+	// TODO:
+	// check COM_Handler for NULL
+	const BYTE const_ucWriteCount = 8;
+
+	*dwNumBytesWritten = 0;
+
+	BOOL bWriteStatus = WriteFile(*hPort, v_WriteBuffer, const_ucWriteCount, dwNumBytesWritten, NULL);
+
+	// > Check Valid PROC
+	BYTE errNumber = 0;
+	if (bWriteStatus == FALSE)
+	{
+		// [ERROR: PORT OP FAILURE]
+
+		*dwNumBytesWritten = GetLastError();
+
+		errNumber = COM_PORT_OP_FAILURE;
+	}
+	else
+	{
+		if (*dwNumBytesWritten != const_ucWriteCount)
 		{
 			// [ERROR: TRANSFER MISMATCH]
 

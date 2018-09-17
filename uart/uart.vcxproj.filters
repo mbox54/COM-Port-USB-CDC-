@@ -24,6 +24,9 @@
     <ClCompile Include="COMPort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="COMPort_overlap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

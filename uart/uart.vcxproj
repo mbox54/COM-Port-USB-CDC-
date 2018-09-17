@@ -102,6 +102,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="COMPort.cpp" />
+    <ClCompile Include="COMPort_overlap.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="uart.cpp" />
   </ItemGroup>
