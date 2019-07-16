@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <conio.h>
-//#include "..\..\..\library\CyUSBSerialVCP\CyUSBSerialVCP.h"
 
 #include "COMPort.h"
 
